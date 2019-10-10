@@ -22,12 +22,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-            version "3.10.2"
-        }
-    }
+//    externalNativeBuild {
+//        cmake {
+//            path "src/main/cpp/CMakeLists.txt"
+//            version "3.10.2"
+//        }
+//    }
 }
 
 dependencies {
@@ -40,7 +40,6 @@ dependencies {
 
     implementation 'com.sscl.baselibrary:x:0.0.10'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation project(path: ':serialportlibrary')
-    // 串口
-    implementation 'com.github.licheedev.Android-SerialPort-API:serialport:1.0.1'
+    implementation project(path: ':x')
+    implementation project(path: ':recyclerviewadapterhelperxlibrary')
 }

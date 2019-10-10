@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">串口调试工具（助手）</string>
     <string name="serial_port_colon">设备串口：</string>
     <string name="baud_rate_colon">波特率：</string>
     <string name="command_colon">命令：</string>
@@ -10,4 +11,8 @@
     <string name="close_serial_port">关闭串口</string>
     <string name="serial_not_supported">串口打开失败</string>
     <string name="baud_rate_not_supported">错误的波特率</string>
+    <string name="serial_port_is_opend">串口已打开</string>
+    <string name="serial_port_open_failed">串口打开失败</string>
+    <string name="show_time_stamp">显示时间戳</string>
+    <string name="send_failed">发送失败</string>
 </resources>

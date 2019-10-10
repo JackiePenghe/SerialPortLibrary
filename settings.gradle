@@ -1,2 +1,2 @@
-include ':app', ':serialportlibrary',':recyclerviewadapterhelperxlibrary'
+include ':app', ':x',':recyclerviewadapterhelperxlibrary'
 rootProject.name='SerialPortSample'

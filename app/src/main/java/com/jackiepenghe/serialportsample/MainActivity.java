@@ -1,24 +1,36 @@
 package com.jackiepenghe.serialportsample;
 
 import android.graphics.Color;
-import android.os.SystemClock;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.jackiepenghe.serialportlibrary.OnSerialPortDataChangedListener;
 import com.jackiepenghe.serialportlibrary.SerialPortManager;
+import com.jackiepenghe.serialportsample.adapter.ReceivedDataRecyclerViewAdapter;
+import com.jackiepenghe.serialportsample.adapter.SendDataRecyclerViewAdapter;
 import com.jackiepenghe.serialportsample.adapter.SerialPortAdapter;
 import com.sscl.baselibrary.activity.BaseAppCompatActivity;
+import com.sscl.baselibrary.textwatcher.HexTextAutoAddEmptyCharInputWatcher;
 import com.sscl.baselibrary.utils.ConversionUtil;
 import com.sscl.baselibrary.utils.DebugUtil;
+import com.sscl.baselibrary.utils.DefaultItemDecoration;
 import com.sscl.baselibrary.utils.ToastUtil;
 import com.sscl.baselibrary.view.ReSpinner;
 
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class MainActivity extends BaseAppCompatActivity {
 
@@ -43,20 +55,45 @@ public class MainActivity extends BaseAppCompatActivity {
 //     */
 //    public native String stringFromJNI();
 
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.CHINESE);
+
     private static final String TAG = MainActivity.class.getSimpleName();
+
     private static final String NULL = "NULL";
 
     private ArrayList<String> serialPortAdapterData = new ArrayList<>();
 
     private SerialPortAdapter serialPortAdapter = new SerialPortAdapter(serialPortAdapterData);
 
+    private ArrayList<String> receivedData = new ArrayList<>();
+
+    private ArrayList<String> sendData = new ArrayList<>();
+
+    private DefaultItemDecoration defaultItemDecoration = DefaultItemDecoration.newLine(Color.GRAY);
+
+    private ReceivedDataRecyclerViewAdapter receivedDataRecyclerViewAdapter = new ReceivedDataRecyclerViewAdapter(receivedData);
+
+    private SendDataRecyclerViewAdapter sendDataRecyclerViewAdapter = new SendDataRecyclerViewAdapter(sendData);
+
     private ArrayAdapter<CharSequence> baudRateAdapter;
+
+    private ArrayAdapter<CharSequence> encodingAdapter;
 
     private TextView nullSerialPortTv;
 
     private Button openSerialPortBtn, closeSerialPortBtn;
 
-    private ReSpinner serialPortReSpinner, baudRateReSpinner;
+    private ReSpinner serialPortReSpinner, baudRateReSpinner, encodingRespiner;
+
+    private RecyclerView sendDataRecyclerView, receivedDataRecyclerView;
+
+    private EditText commandEt;
+
+    private Button sendBtn;
+
+    private CheckBox hexCb, timeStampCb;
+
+    private HexTextAutoAddEmptyCharInputWatcher hexTextAutoAddEmptyCharInputWatcher;
 
     /**
      * 点击事件的监听
@@ -71,11 +108,15 @@ public class MainActivity extends BaseAppCompatActivity {
                 case R.id.close_serial_port_btn:
                     closeSerialPort();
                     break;
+                case R.id.send_cmd_btn:
+                    sendData();
+                    break;
                 default:
                     break;
             }
         }
     };
+
     /**
      * 串口监听
      */
@@ -84,14 +125,49 @@ public class MainActivity extends BaseAppCompatActivity {
         public void serialPortDataReceived(byte[] data, int size) {
             byte[] cache = new byte[size];
             System.arraycopy(data, 0, cache, 0, size);
-            DebugUtil.warnOut(TAG, "serialPortDataReceived cache = " + ConversionUtil.bytesToHexStr(cache));
-            DebugUtil.warnOut(TAG, "serialPortDataReceived cacheStr = " + new String(cache));
-            SerialPortManager.writeData(cache);
+            String result = "";
+            if (timeStampCb.isChecked()) {
+                result += getTimeStamp() + "\n-------------\n";
+            }
+
+            if (hexCb.isChecked()) {
+                result += ConversionUtil.bytesToHexStr(cache);
+            } else {
+                String encoding = encodingRespiner.getSelectedItem().toString();
+                result += new String(data, Charset.forName(encoding));
+            }
+            receivedData.add(result);
+            receivedDataRecyclerViewAdapter.notifyItemInserted(receivedData.size() - 1);
+            receivedDataRecyclerView.scrollToPosition(receivedData.size() - 1);
         }
     };
-    private int count;
-
-    private int MAX_COUNT = 50;
+    private CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (buttonView.getId() == R.id.show_with_hex) {
+                if (hexTextAutoAddEmptyCharInputWatcher == null) {
+                    hexTextAutoAddEmptyCharInputWatcher = new HexTextAutoAddEmptyCharInputWatcher(commandEt, Integer.MAX_VALUE);
+                }
+                String s = commandEt.getText().toString();
+                if (isChecked) {
+                    commandEt.addTextChangedListener(hexTextAutoAddEmptyCharInputWatcher);
+                    String encoding = encodingRespiner.getSelectedItem().toString();
+                    byte[] bytes = s.getBytes(Charset.forName(encoding));
+                    String hexStr = ConversionUtil.bytesToHexStr(bytes);
+                    commandEt.setText(hexStr);
+                    commandEt.setSelection(hexStr.length());
+                } else {
+                    commandEt.removeTextChangedListener(hexTextAutoAddEmptyCharInputWatcher);
+                    byte[] bytes = ConversionUtil.hexStringToByteArray(s);
+                    if (bytes != null) {
+                        String encoding = encodingRespiner.getSelectedItem().toString();
+                        String str = new String(bytes, Charset.forName(encoding));
+                        commandEt.setText(str);
+                    }
+                }
+            }
+        }
+    };
 
 
     @Override
@@ -121,11 +197,19 @@ public class MainActivity extends BaseAppCompatActivity {
         closeSerialPortBtn = findViewById(R.id.close_serial_port_btn);
         baudRateReSpinner = findViewById(R.id.baud_rate_spinner);
         nullSerialPortTv = findViewById(R.id.null_serial_port);
+        sendDataRecyclerView = findViewById(R.id.send_data_recycler_view);
+        receivedDataRecyclerView = findViewById(R.id.received_data_recycler_view);
+        commandEt = findViewById(R.id.command_et);
+        sendBtn = findViewById(R.id.send_cmd_btn);
+        hexCb = findViewById(R.id.show_with_hex);
+        timeStampCb = findViewById(R.id.show_time_stamp);
+        encodingRespiner = findViewById(R.id.encoding_spinner);
     }
 
     @Override
     protected void initViewData() {
         initReSpinnerData();
+        initRecyclerViewData();
     }
 
     @Override
@@ -136,6 +220,9 @@ public class MainActivity extends BaseAppCompatActivity {
     @Override
     protected void initEvents() {
         openSerialPortBtn.setOnClickListener(onClickListener);
+        closeSerialPortBtn.setOnClickListener(onClickListener);
+        sendBtn.setOnClickListener(onClickListener);
+        hexCb.setOnCheckedChangeListener(onCheckedChangeListener);
         SerialPortManager.setOnSerialPortDataChangedListener(onSerialPortDataChangedListener);
     }
 
@@ -188,18 +275,8 @@ public class MainActivity extends BaseAppCompatActivity {
             closeSerialPortBtn.setClickable(false);
             closeSerialPortBtn.setTextColor(Color.GRAY);
         }
-        int size = serialPortAdapterData.size();
         serialPortAdapter.notifyDataSetChanged();
-        if (size == 1) {
-            String s = serialPortAdapterData.get(0);
-            if (!NULL.equals(s)) {
-                openSerialPort();
-            }
-        } else if (size > 3) {
-            serialPortReSpinner.setSelection(4);
-            baudRateReSpinner.setSelection(13);
-            openSerialPort();
-        }
+        timeStampCb.setChecked(true);
     }
 
     /**
@@ -207,8 +284,12 @@ public class MainActivity extends BaseAppCompatActivity {
      */
     private void initReSpinnerData() {
         serialPortReSpinner.setAdapter(serialPortAdapter);
+
         baudRateAdapter = ArrayAdapter.createFromResource(this, R.array.baud_rate_array, android.R.layout.simple_list_item_1);
         baudRateReSpinner.setAdapter(baudRateAdapter);
+
+        encodingAdapter = ArrayAdapter.createFromResource(this, R.array.encoding_array, android.R.layout.simple_list_item_1);
+        encodingRespiner.setAdapter(encodingAdapter);
     }
 
     /**
@@ -216,7 +297,8 @@ public class MainActivity extends BaseAppCompatActivity {
      */
     private void openSerialPort() {
         if (SerialPortManager.isOpened()) {
-            SerialPortManager.closeSerialPort();
+            ToastUtil.toastL(this, R.string.serial_port_is_opend);
+            return;
         }
 
         String serialPort = serialPortAdapterData.get(serialPortReSpinner.getSelectedItemPosition());
@@ -239,24 +321,56 @@ public class MainActivity extends BaseAppCompatActivity {
         DebugUtil.warnOut(TAG, "baudRate = " + baudRate);
         boolean open = SerialPortManager.openSerialPort(serialPort, baudRate);
         if (open) {
+            ToastUtil.toastL(this, R.string.serial_port_is_opend);
             DebugUtil.warnOut(TAG, "open serial port succeed");
         } else {
             DebugUtil.warnOut(TAG, "open serial port failed");
+            ToastUtil.toastL(this, R.string.serial_port_open_failed);
         }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (count < MAX_COUNT){
-                    SerialPortManager.writeData("测试数据：" + count);
-                    count++;
-                    SystemClock.sleep(1000);
-                }
-            }
-        }).start();
     }
 
     private void closeSerialPort() {
         SerialPortManager.closeSerialPort();
+    }
+
+    private void initRecyclerViewData() {
+        receivedDataRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        receivedDataRecyclerView.addItemDecoration(defaultItemDecoration);
+        receivedDataRecyclerViewAdapter.bindToRecyclerView(receivedDataRecyclerView);
+
+        sendDataRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        sendDataRecyclerView.addItemDecoration(defaultItemDecoration);
+        sendDataRecyclerViewAdapter.bindToRecyclerView(sendDataRecyclerView);
+    }
+
+    private synchronized String getTimeStamp() {
+        return SIMPLE_DATE_FORMAT.format(System.currentTimeMillis());
+    }
+
+    private void sendData() {
+        String data = commandEt.getText().toString();
+        if (data.isEmpty()){
+            return;
+        }
+        String encoding = encodingRespiner.getSelectedItem().toString();
+        boolean b;
+        if (!hexCb.isChecked()) {
+            b = SerialPortManager.writeData(data, Charset.forName(encoding));
+        }else {
+            byte[] bytes = ConversionUtil.hexStringToByteArray(data);
+            if (bytes == null){
+                ToastUtil.toastL(this,R.string.send_failed);
+                return;
+            }
+            b = SerialPortManager.writeData(bytes);
+            data = ConversionUtil.bytesToHexStr(bytes);
+        }
+        if (b) {
+            sendData.add(data);
+            sendDataRecyclerViewAdapter.notifyItemInserted(sendData.size() - 1);
+        }else {
+            ToastUtil.toastL(this,R.string.send_failed);
+        }
+
     }
 }

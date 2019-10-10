@@ -1,7 +1,13 @@
 package com.jackiepenghe.serialportlibrary;
 
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
+import android.util.DebugUtils;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,12 +25,16 @@ public class SerialPortManager {
 
     private static final ThreadFactory THREAD_FACTORY = new ThreadFactory() {
         @Override
-        public Thread newThread(Runnable r) {
+        public Thread newThread(@NonNull Runnable r) {
             return new Thread(r);
         }
     };
 
     private static final Handler HANDLER = new Handler();
+
+    private static int serialPortCacheDataSize = 1024;
+
+    private static int readDataDelay = 100;
 
     private static OnSerialPortDataChangedListener onSerialPortDataChangedListener;
 
@@ -40,6 +50,10 @@ public class SerialPortManager {
 
     public static void setOnSerialPortDataChangedListener(OnSerialPortDataChangedListener onSerialPortDataChangedListener) {
         SerialPortManager.onSerialPortDataChangedListener = onSerialPortDataChangedListener;
+    }
+
+    public static void setReadDataDelay(int readDataDelay) {
+        SerialPortManager.readDataDelay = readDataDelay;
     }
 
     public static String[] getAllDevices() {
@@ -58,9 +72,8 @@ public class SerialPortManager {
             outputStream = serialPort.getOutputStream();
             startReceiveDataThread();
             return true;
-        } catch (IOException e) {
-            serialPort.close();
-            serialPort = null;
+        } catch (IOException | SecurityException e) {
+            closeSerialPort();
             return false;
         }
     }
@@ -70,7 +83,7 @@ public class SerialPortManager {
             serialPort.close();
             serialPort = null;
         }
-        if (receiveDataThread != null){
+        if (receiveDataThread != null) {
             receiveDataThread.interrupt();
             receiveDataThread = null;
         }
@@ -92,59 +105,20 @@ public class SerialPortManager {
         }
     }
 
+    public static void setSerialPortCacheDataSize(int size){
+        SerialPortManager.serialPortCacheDataSize = size;
+    }
+
     public static boolean isOpened() {
         return serialPort != null;
     }
 
-    private static void startReceiveDataThread() {
-        if (receiveDataThread != null && receiveDataThread.isAlive()) {
-            return;
-        }
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                final byte[] buffer = new byte[1024];
-                while (true) {
-                    if (Thread.currentThread().isInterrupted()) {
-                        break;
-                    }
-                    if (inputStream == null) {
-                        break;
-                    }
-                    final int size;
-                    try {
-                        size = inputStream.read(buffer);
-                    } catch (IOException e) {
-                        continue;
-                    }
-                    if (size == 0){
-                        continue;
-                    }
-                    HANDLER.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (onSerialPortDataChangedListener != null) {
-                                onSerialPortDataChangedListener.serialPortDataReceived(buffer, size);
-                            }
-                        }
-                    });
-                }
-            }
-        };
-        receiveDataThread = THREAD_FACTORY.newThread(runnable);
-        receiveDataThread.start();
-    }
-
-    private SerialPortManager() {
-    }
-
     public static boolean writeData(String data) {
-      return writeData(data,Charset.forName("GBK"));
+        return writeData(data, Charset.forName("GBK"));
     }
 
-    public static boolean writeData(String data, Charset charset){
-        if (outputStream == null){
+    public static boolean writeData(String data, Charset charset) {
+        if (outputStream == null) {
             return false;
         }
         try {
@@ -156,7 +130,7 @@ public class SerialPortManager {
     }
 
     public static boolean writeData(byte[] data) {
-        if (outputStream == null){
+        if (outputStream == null) {
             return false;
         }
         try {
@@ -165,5 +139,58 @@ public class SerialPortManager {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    private static void startReceiveDataThread() {
+        if (receiveDataThread != null && receiveDataThread.isAlive()) {
+            return;
+        }
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                byte[] buffer = new byte[serialPortCacheDataSize];
+                while (true) {
+                    if (buffer.length != serialPortCacheDataSize){
+                        buffer = new byte[serialPortCacheDataSize];
+                    }
+                    if (Thread.currentThread().isInterrupted()) {
+                        break;
+                    }
+                    if (inputStream == null) {
+                        break;
+                    }
+                    SystemClock.sleep(readDataDelay);
+                    int available;
+                    final int size;
+                    try {
+                        available = inputStream.available();
+                        size = inputStream.read(buffer,0,available);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                    if (size == 0) {
+                        continue;
+                    }
+                    Log.w("tag","available = " + available);
+                    Log.w("tag","size = " + size);
+                    final byte[] finalBuffer = buffer;
+                    HANDLER.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (onSerialPortDataChangedListener != null) {
+                                onSerialPortDataChangedListener.serialPortDataReceived(finalBuffer, size);
+                            }
+                        }
+                    });
+                    SystemClock.sleep(50);
+                }
+            }
+        };
+        receiveDataThread = THREAD_FACTORY.newThread(runnable);
+        receiveDataThread.start();
+    }
+
+    private SerialPortManager() {
     }
 }

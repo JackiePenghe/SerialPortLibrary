@@ -13,11 +13,11 @@
 
 
         <TextView
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size_with_colon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/serial_port_colon" />
+            android:text="@string/serial_port_colon"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_with_colon" />
 
         <com.sscl.baselibrary.view.ReSpinner
             android:id="@+id/serial_port_spinner"
@@ -26,11 +26,11 @@
             android:layout_weight="1" />
 
         <TextView
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size_with_colon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/baud_rate_colon" />
+            android:text="@string/baud_rate_colon"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_with_colon" />
 
         <com.sscl.baselibrary.view.ReSpinner
             android:id="@+id/baud_rate_spinner"
@@ -39,12 +39,12 @@
             android:layout_weight="1" />
 
         <TextView
-            android:visibility="gone"
             android:id="@+id/null_serial_port"
-            android:text="@string/_null"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content"/>
+            android:text="@string/_null"
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout
@@ -53,27 +53,28 @@
 
         <Button
             android:id="@+id/open_serial_port_btn"
-            android:text="@string/open_serial_port"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content"/>
+            android:text="@string/open_serial_port" />
 
         <Button
             android:id="@+id/close_serial_port_btn"
-            android:text="@string/close_serial_port"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content"/>
+            android:text="@string/close_serial_port" />
     </LinearLayout>
 
     <View
-        android:background="@android:color/darker_gray"
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -83,37 +84,16 @@
             android:orientation="vertical">
 
             <TextView
-                android:textColor="@android:color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sender_area"
+                android:textColor="@android:color/black"
                 android:textSize="@dimen/text_size" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/send_data_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <TextView
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/text_size_with_colon"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/command_colon" />
-
-            <EditText
-                android:id="@+id/command_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:drawable/edit_text" />
-
-            <Button
-                android:textColor="@android:color/black"
-                android:id="@+id/send_cmd_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/send" />
+                android:layout_height="match_parent" />
         </LinearLayout>
 
         <View
@@ -128,16 +108,81 @@
             android:orientation="vertical">
 
             <TextView
-                android:textColor="@android:color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/receiving_area"
+                android:textColor="@android:color/black"
                 android:textSize="@dimen/text_size" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/received_data_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/command_colon"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_with_colon" />
+
+            <EditText
+                android:id="@+id/command_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/edit_text"
+                android:inputType="text"
+                android:labelFor="@id/command_et" />
+
+            <Button
+                android:id="@+id/send_cmd_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/send"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/show_with_hex"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hex" />
+
+            <CheckBox
+                android:id="@+id/show_time_stamp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/show_time_stamp" />
+
+            <com.sscl.baselibrary.view.ReSpinner
+                android:id="@+id/encoding_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

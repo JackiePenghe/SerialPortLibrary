@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="encoding_array">
+        <item>@string/gbk</item>
+        <item>@string/utf_8</item>
+    </string-array>
+</resources>

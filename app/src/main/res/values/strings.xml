@@ -10,4 +10,11 @@
     <string name="close_serial_port">Close serial</string>
     <string name="serial_not_supported">Serial port can not open</string>
     <string name="baud_rate_not_supported">Baud rate not supported</string>
+    <string name="serial_port_is_opend">Serial port is opend</string>
+    <string name="serial_port_open_failed">Serial port open failed!</string>
+    <string name="hex" translatable="false">HEX</string>
+    <string name="show_time_stamp">Show time stamp</string>
+    <string name="gbk" translatable="false">GBK</string>
+    <string name="utf_8" translatable="false">UTF-8</string>
+    <string name="send_failed">Send failed</string>
 </resources>
