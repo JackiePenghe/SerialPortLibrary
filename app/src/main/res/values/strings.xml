@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SerialPortSample</string>
+    <string name="serial_port_colon">Serial Port:</string>
+    <string name="baud_rate_colon">Baud rate:</string>
+    <string name="command_colon">Command:</string>
+    <string name="send">Send</string>
+    <string name="sender_area">Sender area</string>
+    <string name="receiving_area">Receiving area</string>
+    <string name="open_serial_port">Open serial</string>
+    <string name="close_serial_port">Close serial</string>
+    <string name="serial_not_supported">Serial port can not open</string>
+    <string name="baud_rate_not_supported">Baud rate not supported</string>
+</resources>

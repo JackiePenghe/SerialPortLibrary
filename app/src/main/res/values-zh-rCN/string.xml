@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="serial_port_colon">设备串口：</string>
+    <string name="baud_rate_colon">波特率：</string>
+    <string name="command_colon">命令：</string>
+    <string name="send">发送</string>
+    <string name="sender_area">发送区域</string>
+    <string name="receiving_area">接收区域</string>
+    <string name="open_serial_port">打开串口</string>
+    <string name="close_serial_port">关闭串口</string>
+    <string name="serial_not_supported">串口打开失败</string>
+    <string name="baud_rate_not_supported">错误的波特率</string>
+</resources>
