@@ -41,7 +41,7 @@ private void openSerialPort() {
     return;
   }
   DebugUtil.warnOut(TAG, "baudRate = " + baudRate);
-  boolean open = SerialPortManager.openSerialPort(serialPort, baudRate);
+  boolean open = SerialPortManager.openSerialPort(serialPortPath, baudRate);
   if (open) {
       ToastUtil.toastL(this, R.string.serial_port_is_opend);
   } else {
