@@ -73,13 +73,16 @@ if (!succeed){
 
 ## 注意（notice）
 
-如果接收的数据过长，导致串口接收变成条数据时，可以设置串口延时，这样就不会被强制分成几次触发。默认值为100毫秒。
+如果接收的数据过长，会导致串口接收时分成多条数据。
+解决方案：设置串口读取延时。
+默认值为100毫秒。
  
-If the received data is too long, causing the serial port to receive a piece of data, the serial delay can be set, so that it will not be forced to divide into several triggered.The default read delay value is 100 ms;
+If the received data is too long, it will cause the serial port to receive more than one data.
+Solution: Set serial read delay.
+The default read delay value is 100 ms;
 
 ```java
 //设置读取数据的延时，单位：毫秒
 //set read data delay time. Unit:ms
 SerialPortManager.setReadDataDelay(readDelay);
 ```
- 
