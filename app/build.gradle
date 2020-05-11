@@ -33,7 +33,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation 'com.sscl:baselibrary:0.0.39'
-//    implementation 'com.sscl.serialportlibrary:x:0.0.1'
+    implementation 'com.sscl:serialportlibrary:0.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation project(path: ':serialportlibrary')
     implementation project(path: ':recyclerviewadapterhelperxlibrary')
