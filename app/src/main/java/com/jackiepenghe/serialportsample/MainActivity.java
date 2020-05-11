@@ -25,35 +25,17 @@ import com.sscl.baselibrary.utils.ConversionUtil;
 import com.sscl.baselibrary.utils.DebugUtil;
 import com.sscl.baselibrary.utils.DefaultItemDecoration;
 import com.sscl.baselibrary.utils.ToastUtil;
-import com.sscl.baselibrary.view.ReSpinner;
+import com.sscl.baselibrary.widget.ReSpinner;
 
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * @author pengh
+ */
 public class MainActivity extends BaseAppCompatActivity {
-
-    // Used to load the 'native-lib' library on application startup.
-  /*  static {
-        System.loadLibrary("native-lib");
-    }*/
-
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-
-//        // Example of a call to a native method
-//        TextView tv = findViewById(R.id.sample_text);
-//        tv.setText(stringFromJNI());
-//    }
-
-//    /**
-//     * A native method that is implemented by the 'native-lib' native library,
-//     * which is packaged with this application.
-//     */
-//    public native String stringFromJNI();
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.CHINESE);
 
@@ -76,8 +58,6 @@ public class MainActivity extends BaseAppCompatActivity {
     private SendDataRecyclerViewAdapter sendDataRecyclerViewAdapter = new SendDataRecyclerViewAdapter(sendData);
 
     private ArrayAdapter<CharSequence> baudRateAdapter;
-
-    private ArrayAdapter<CharSequence> encodingAdapter;
 
     private TextView nullSerialPortTv;
 
@@ -131,7 +111,7 @@ public class MainActivity extends BaseAppCompatActivity {
             }
 
             if (hexCb.isChecked()) {
-                result += ConversionUtil.bytesToHexStr(cache);
+                result += ConversionUtil.byteArrayToHexStr(cache);
             } else {
                 String encoding = encodingRespiner.getSelectedItem().toString();
                 result += new String(data, Charset.forName(encoding));
@@ -153,7 +133,7 @@ public class MainActivity extends BaseAppCompatActivity {
                     commandEt.addTextChangedListener(hexTextAutoAddEmptyCharInputWatcher);
                     String encoding = encodingRespiner.getSelectedItem().toString();
                     byte[] bytes = s.getBytes(Charset.forName(encoding));
-                    String hexStr = ConversionUtil.bytesToHexStr(bytes);
+                    String hexStr = ConversionUtil.byteArrayToHexStr(bytes);
                     commandEt.setText(hexStr);
                     commandEt.setSelection(hexStr.length());
                 } else {
@@ -288,7 +268,7 @@ public class MainActivity extends BaseAppCompatActivity {
         baudRateAdapter = ArrayAdapter.createFromResource(this, R.array.baud_rate_array, android.R.layout.simple_list_item_1);
         baudRateReSpinner.setAdapter(baudRateAdapter);
 
-        encodingAdapter = ArrayAdapter.createFromResource(this, R.array.encoding_array, android.R.layout.simple_list_item_1);
+        ArrayAdapter<CharSequence> encodingAdapter = ArrayAdapter.createFromResource(this, R.array.encoding_array, android.R.layout.simple_list_item_1);
         encodingRespiner.setAdapter(encodingAdapter);
     }
 
@@ -297,35 +277,35 @@ public class MainActivity extends BaseAppCompatActivity {
      */
     private void openSerialPort() {
         if (SerialPortManager.isOpened()) {
-            ToastUtil.toastL(this, R.string.serial_port_is_opend);
+            ToastUtil.toastLong(this, R.string.serial_port_is_opend);
             return;
         }
 
         String serialPort = serialPortAdapterData.get(serialPortReSpinner.getSelectedItemPosition());
         if (NULL.equals(serialPort)) {
-            ToastUtil.toastL(this, R.string.serial_not_supported);
+            ToastUtil.toastLong(this, R.string.serial_not_supported);
             return;
         }
         CharSequence baudRateAdaterItem = baudRateAdapter.getItem(baudRateReSpinner.getSelectedItemPosition());
         if (baudRateAdaterItem == null) {
-            ToastUtil.toastL(this, R.string.baud_rate_not_supported);
+            ToastUtil.toastLong(this, R.string.baud_rate_not_supported);
             return;
         }
         int baudRate;
         try {
-            baudRate = Integer.valueOf(baudRateAdaterItem.toString());
+            baudRate = Integer.parseInt(baudRateAdaterItem.toString());
         } catch (NumberFormatException e) {
-            ToastUtil.toastL(this, R.string.baud_rate_not_supported);
+            ToastUtil.toastLong(this, R.string.baud_rate_not_supported);
             return;
         }
         DebugUtil.warnOut(TAG, "baudRate = " + baudRate);
         boolean open = SerialPortManager.openSerialPort(serialPort, baudRate);
         if (open) {
-            ToastUtil.toastL(this, R.string.serial_port_is_opend);
+            ToastUtil.toastLong(this, R.string.serial_port_is_opend);
             DebugUtil.warnOut(TAG, "open serial port succeed");
         } else {
             DebugUtil.warnOut(TAG, "open serial port failed");
-            ToastUtil.toastL(this, R.string.serial_port_open_failed);
+            ToastUtil.toastLong(this, R.string.serial_port_open_failed);
         }
     }
 
@@ -359,17 +339,17 @@ public class MainActivity extends BaseAppCompatActivity {
         }else {
             byte[] bytes = ConversionUtil.hexStringToByteArray(data);
             if (bytes == null){
-                ToastUtil.toastL(this,R.string.send_failed);
+                ToastUtil.toastLong(this,R.string.send_failed);
                 return;
             }
             b = SerialPortManager.writeData(bytes);
-            data = ConversionUtil.bytesToHexStr(bytes);
+            data = ConversionUtil.byteArrayToHexStr(bytes);
         }
         if (b) {
             sendData.add(data);
             sendDataRecyclerViewAdapter.notifyItemInserted(sendData.size() - 1);
         }else {
-            ToastUtil.toastL(this,R.string.send_failed);
+            ToastUtil.toastLong(this,R.string.send_failed);
         }
 
     }

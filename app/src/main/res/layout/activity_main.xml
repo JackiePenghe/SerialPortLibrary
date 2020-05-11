@@ -19,7 +19,7 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size_with_colon" />
 
-        <com.sscl.baselibrary.view.ReSpinner
+        <com.sscl.baselibrary.widget.ReSpinner
             android:id="@+id/serial_port_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size_with_colon" />
 
-        <com.sscl.baselibrary.view.ReSpinner
+        <com.sscl.baselibrary.widget.ReSpinner
             android:id="@+id/baud_rate_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -179,7 +179,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/show_time_stamp" />
 
-            <com.sscl.baselibrary.view.ReSpinner
+            <com.sscl.baselibrary.widget.ReSpinner
                 android:id="@+id/encoding_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
