@@ -103,7 +103,7 @@ public class MultiSerialPortSampleActivity extends BaseAppCompatActivity {
         b = MultipleSerialPortManager.openSerialPort("/dev/ttyS3", 115200, new OnSerialPortDataChangedListener() {
             @Override
             public void serialPortDataReceived(byte[] data, int size) {
-                DebugUtil.warnOut(TAG,"serialPortDataReceived ttyS2");
+                DebugUtil.warnOut(TAG,"serialPortDataReceived ttyS3");
             }
         });
         if (b) {
