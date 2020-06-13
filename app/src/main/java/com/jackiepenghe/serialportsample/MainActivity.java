@@ -50,6 +50,9 @@ public class MainActivity extends BaseAppCompatActivity {
                 case R.id.single:
                     jumpToSingleUseSampleActivity();
                     break;
+                case R.id.multi:
+                    jumpToMultiUseSampleActivity();
+                    break;
                 default:
                     break;
             }
@@ -95,6 +98,7 @@ public class MainActivity extends BaseAppCompatActivity {
     @Override
     protected void initEvents() {
         singleUseBtn.setOnClickListener(onClickListener);
+        multiUseBtn.setOnClickListener(onClickListener);
     }
 
     @Override
@@ -120,6 +124,11 @@ public class MainActivity extends BaseAppCompatActivity {
 
     private void jumpToSingleUseSampleActivity() {
         Intent intent = new Intent(this, SerialPortSampleActivity.class);
+        startActivity(intent);
+    }
+
+    private void jumpToMultiUseSampleActivity() {
+        Intent intent = new Intent(this, MultiSerialPortSampleActivity.class);
         startActivity(intent);
     }
 

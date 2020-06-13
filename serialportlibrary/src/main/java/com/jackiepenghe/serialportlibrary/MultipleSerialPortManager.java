@@ -4,11 +4,14 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -28,21 +31,17 @@ public class MultipleSerialPortManager {
 
     private static int readDataDelay = 100;
 
-    private static OnMultiSerialPortDataChangedListener onMultiSerialPortDataChangedListener;
-
     private static HashMap<String, InputStream> inputStreams = new HashMap<>();
 
     private static HashMap<String, OutputStream> outputStreams = new HashMap<>();
 
-    private static Thread receiveDataThread;
+    private static HashMap<String, Thread> receiveDataThreads = new HashMap<>();
 
     private static SerialPortFinder serialPortFinder = SerialPortFinder.getInstance();
 
     private static HashMap<String, SerialPort> serialPorts = new HashMap<>();
 
-    public static void setOnMultiSerialPortDataChangedListener(OnMultiSerialPortDataChangedListener onMultiSerialPortDataChangedListener) {
-        MultipleSerialPortManager.onMultiSerialPortDataChangedListener = onMultiSerialPortDataChangedListener;
-    }
+    private static HashMap<String, OnSerialPortDataChangedListener> onSerialPortDataChangedListeners = new HashMap<>();
 
     public static void setReadDataDelay(int readDataDelay) {
         MultipleSerialPortManager.readDataDelay = readDataDelay;
@@ -56,7 +55,7 @@ public class MultipleSerialPortManager {
         return serialPortFinder.getAllDevicesPath();
     }
 
-    public static boolean openSerialPort(String serialPortPath, int baudrate) {
+    public static boolean openSerialPort(String serialPortPath, int baudrate, @Nullable OnSerialPortDataChangedListener onSerialPortDataChangedListener) {
         if (serialPorts.containsKey(serialPortPath)) {
             return false;
         }
@@ -66,7 +65,8 @@ public class MultipleSerialPortManager {
             inputStreams.put(serialPortPath, inputStream);
             OutputStream outputStream = serialPort.getOutputStream();
             outputStreams.put(serialPortPath, outputStream);
-            startReceiveDataThread();
+            startReceiveDataThread(serialPortPath);
+            onSerialPortDataChangedListeners.put(serialPortPath, onSerialPortDataChangedListener);
             return true;
         } catch (IOException | SecurityException e) {
             closeSerialPort(serialPortPath);
@@ -83,19 +83,15 @@ public class MultipleSerialPortManager {
             return;
         }
         Set<Map.Entry<String, SerialPort>> entries = serialPorts.entrySet();
-        Iterator<Map.Entry<String, SerialPort>> iterator = entries.iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, SerialPort> next = iterator.next();
+        for (Map.Entry<String, SerialPort> next : entries) {
             String key = next.getKey();
             closeSerialPort(key, false);
         }
+
         serialPorts.clear();
         inputStreams.clear();
         outputStreams.clear();
-        if (receiveDataThread != null) {
-            receiveDataThread.interrupt();
-            receiveDataThread = null;
-        }
+        receiveDataThreads.clear();
     }
 
     private static void closeSerialPort(String serialPortPath, boolean needRemove) {
@@ -132,13 +128,9 @@ public class MultipleSerialPortManager {
             }
         }
         if (needRemove) {
-            if (serialPorts.isEmpty()) {
-                if (receiveDataThread != null) {
-                    receiveDataThread.interrupt();
-                    receiveDataThread = null;
-                }
-            }
+            receiveDataThreads.remove(serialPortPath);
         }
+
     }
 
     public static void setSerialPortCacheDataSize(int size) {
@@ -185,58 +177,62 @@ public class MultipleSerialPortManager {
         }
     }
 
-    private static void startReceiveDataThread() {
-        if (receiveDataThread != null && receiveDataThread.isAlive()) {
+    private static void startReceiveDataThread(final String serialPortPath) {
+        if (receiveDataThreads.containsKey(serialPortPath)) {
             return;
         }
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                Looper.prepare();
                 byte[] buffer = new byte[serialPortCacheDataSize];
                 while (true) {
                     if (buffer.length != serialPortCacheDataSize) {
                         buffer = new byte[serialPortCacheDataSize];
                     }
                     if (Thread.currentThread().isInterrupted()) {
+                        receiveDataThreads.remove(serialPortPath);
                         break;
                     }
                     if (inputStreams.isEmpty()) {
+                        receiveDataThreads.remove(serialPortPath);
                         break;
                     }
-                    SystemClock.sleep(readDataDelay);
-                    Set<Map.Entry<String, InputStream>> entries = inputStreams.entrySet();
-                    for (Map.Entry<String, InputStream> entry : entries) {
-                        int available;
-                        final int size;
-                        final String key = entry.getKey();
-                        InputStream value = entry.getValue();
-                        try {
-                            available = value.available();
-                            size = value.read(buffer, 0, available);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            continue;
-                        }
-                        if (size == 0) {
-                            continue;
-                        }
-                        final byte[] finalBuffer = buffer;
-                        HANDLER.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (onMultiSerialPortDataChangedListener != null) {
-                                    onMultiSerialPortDataChangedListener.serialPortDataReceived(key, finalBuffer, size);
-                                }
-                            }
-                        });
+                    InputStream inputStream = inputStreams.get(serialPortPath);
+                    if (inputStream == null) {
+                        receiveDataThreads.remove(serialPortPath);
+                        break;
                     }
-                    SystemClock.sleep(50);
+
+                    SystemClock.sleep(readDataDelay);
+                    int available;
+                    final int size;
+                    try {
+                        available = inputStream.available();
+                        size = inputStream.read(buffer, 0, available);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+                    if (size == 0) {
+                        continue;
+                    }
+                    final byte[] finalBuffer = buffer;
+
+                    HANDLER.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            OnSerialPortDataChangedListener onSerialPortDataChangedListener = onSerialPortDataChangedListeners.get(serialPortPath);
+                            if (onSerialPortDataChangedListener != null) {
+                                onSerialPortDataChangedListener.serialPortDataReceived(finalBuffer, size);
+                            }
+                        }
+                    });
                 }
             }
         };
-        receiveDataThread = THREAD_FACTORY.newThread(runnable);
+        Thread receiveDataThread = THREAD_FACTORY.newThread(runnable);
         receiveDataThread.start();
+        receiveDataThreads.put(serialPortPath, receiveDataThread);
     }
 
     private MultipleSerialPortManager() {

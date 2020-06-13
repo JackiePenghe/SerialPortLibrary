@@ -2,17 +2,23 @@ package com.jackiepenghe.serialportsample;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
 import com.jackiepenghe.serialportlibrary.MultipleSerialPortManager;
-import com.jackiepenghe.serialportlibrary.OnMultiSerialPortDataChangedListener;
+import com.jackiepenghe.serialportlibrary.OnSerialPortDataChangedListener;
 import com.sscl.baselibrary.activity.BaseAppCompatActivity;
+import com.sscl.baselibrary.utils.DebugUtil;
+
+import java.util.logging.Handler;
 
 /**
  * @author jackie
  */
 public class MultiSerialPortSampleActivity extends BaseAppCompatActivity {
+
+    private static final String TAG = MultiSerialPortSampleActivity.class.getSimpleName();
 
     /**
      * 标题栏的返回按钮被按下的时候回调此方法
@@ -85,16 +91,35 @@ public class MultiSerialPortSampleActivity extends BaseAppCompatActivity {
      */
     @Override
     protected void doAfterAll() {
-        String[] allDevicesPath = MultipleSerialPortManager.getAllDevicesPath();
-        boolean b = MultipleSerialPortManager.openSerialPort(allDevicesPath[0], 115200);
-        MultipleSerialPortManager.setOnMultiSerialPortDataChangedListener(new OnMultiSerialPortDataChangedListener() {
+        boolean b = MultipleSerialPortManager.openSerialPort("/dev/ttyS1", 115200, new OnSerialPortDataChangedListener() {
             @Override
-            public void serialPortDataReceived(String serialPortPath, byte[] data, int size) {
-
+            public void serialPortDataReceived(byte[] data, int size) {
+                DebugUtil.warnOut(TAG,"serialPortDataReceived ttyS1");
             }
         });
-        MultipleSerialPortManager.writeData(allDevicesPath[0],"test data");
+        if (b) {
+            DebugUtil.warnOut(TAG,"ttyS1 opened");
+        }
+        b = MultipleSerialPortManager.openSerialPort("/dev/ttyS3", 115200, new OnSerialPortDataChangedListener() {
+            @Override
+            public void serialPortDataReceived(byte[] data, int size) {
+                DebugUtil.warnOut(TAG,"serialPortDataReceived ttyS2");
+            }
+        });
+        if (b) {
+            DebugUtil.warnOut(TAG,"ttyS2 opened");
+        }
 
+    }
+
+    private void writeS1Data() {
+        DebugUtil.warnOut(TAG,"writeS1Data");
+        MultipleSerialPortManager.writeData("/dev/ttyS1", "test data");
+    }
+
+    private void writeS3Data() {
+        DebugUtil.warnOut(TAG,"writeS3Data");
+        MultipleSerialPortManager.writeData("/dev/ttyS3", "test data");
     }
 
     /**
@@ -123,5 +148,13 @@ public class MultiSerialPortSampleActivity extends BaseAppCompatActivity {
     protected void onDestroy() {
         MultipleSerialPortManager.closeAll();
         super.onDestroy();
+    }
+
+    public void write1(View view) {
+        writeS1Data();
+    }
+
+    public void write3(View view) {
+        writeS3Data();
     }
 }
