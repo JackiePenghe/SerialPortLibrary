@@ -98,6 +98,7 @@ MultipleSerialPortManager类。这个类支持同时打开多个串口，并单�
 Add a new class MultipleSerialPortManager.That class can be open and operation multiple serial port.
 
 ### 0.0.3版本修改（0.0.3version）
-使用MultipleSerialPortManager类打开串口时，需要传递一个回调。方便单独监听、
+使用MultipleSerialPortManager类打开串口时，需要传递一个回调。方便单独监听.
+
 when use MultipleSerialPortManager class to open your serialport,need to set callback!
 
