@@ -10,6 +10,7 @@ import com.jackiepenghe.serialportlibrary.MultipleSerialPortManager;
 import com.jackiepenghe.serialportlibrary.OnSerialPortDataChangedListener;
 import com.sscl.baselibrary.activity.BaseAppCompatActivity;
 import com.sscl.baselibrary.utils.DebugUtil;
+import com.sscl.baselibrary.utils.ToastUtil;
 
 import java.util.logging.Handler;
 
@@ -25,7 +26,7 @@ public class MultiSerialPortSampleActivity extends BaseAppCompatActivity {
      */
     @Override
     protected void titleBackClicked() {
-
+        onBackPressed();
     }
 
     /**
@@ -91,34 +92,55 @@ public class MultiSerialPortSampleActivity extends BaseAppCompatActivity {
      */
     @Override
     protected void doAfterAll() {
+        MultipleSerialPortManager.setSerialPortCacheDataSize(40);
         boolean b = MultipleSerialPortManager.openSerialPort("/dev/ttyS1", 115200, new OnSerialPortDataChangedListener() {
             @Override
             public void serialPortDataReceived(byte[] data, int size) {
-                DebugUtil.warnOut(TAG,"serialPortDataReceived ttyS1");
+                DebugUtil.warnOut(TAG, "serialPortDataReceived ttyS1");
+                byte[] validData = new byte[size];
+                System.arraycopy(data, 0, validData, 0, size);
+                String receivedData = new String(validData);
+                ToastUtil.toast(MultiSerialPortSampleActivity.this, receivedData, 300);
             }
         });
         if (b) {
-            DebugUtil.warnOut(TAG,"ttyS1 opened");
+            DebugUtil.warnOut(TAG, "ttyS1 opened");
         }
         b = MultipleSerialPortManager.openSerialPort("/dev/ttyS3", 115200, new OnSerialPortDataChangedListener() {
             @Override
             public void serialPortDataReceived(byte[] data, int size) {
-                DebugUtil.warnOut(TAG,"serialPortDataReceived ttyS3");
+                DebugUtil.warnOut(TAG, "serialPortDataReceived ttyS3");
+                byte[] validData = new byte[size];
+                System.arraycopy(data, 0, validData, 0, size);
+                String receivedData = new String(validData);
+                ToastUtil.toast(MultiSerialPortSampleActivity.this, receivedData, 300);
             }
         });
         if (b) {
-            DebugUtil.warnOut(TAG,"ttyS2 opened");
+            DebugUtil.warnOut(TAG, "ttyS3 opened");
         }
-
+        b = MultipleSerialPortManager.openSerialPort("/dev/ttyS4", 115200, new OnSerialPortDataChangedListener() {
+            @Override
+            public void serialPortDataReceived(byte[] data, int size) {
+                DebugUtil.warnOut(TAG, "serialPortDataReceived ttyS4");
+                byte[] validData = new byte[size];
+                System.arraycopy(data, 0, validData, 0, size);
+                String receivedData = new String(validData);
+                ToastUtil.toast(MultiSerialPortSampleActivity.this, receivedData, 300);
+            }
+        });
+        if (b) {
+            DebugUtil.warnOut(TAG, "ttyS4 opened");
+        }
     }
 
     private void writeS1Data() {
-        DebugUtil.warnOut(TAG,"writeS1Data");
+        DebugUtil.warnOut(TAG, "writeS1Data");
         MultipleSerialPortManager.writeData("/dev/ttyS1", "test data");
     }
 
     private void writeS3Data() {
-        DebugUtil.warnOut(TAG,"writeS3Data");
+        DebugUtil.warnOut(TAG, "writeS3Data");
         MultipleSerialPortManager.writeData("/dev/ttyS3", "test data");
     }
 

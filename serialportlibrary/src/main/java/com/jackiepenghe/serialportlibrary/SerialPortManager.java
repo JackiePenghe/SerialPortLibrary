@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.concurrent.ThreadFactory;
 
 /**
@@ -105,7 +106,7 @@ public class SerialPortManager {
         }
     }
 
-    public static void setSerialPortCacheDataSize(int size){
+    public static void setSerialPortCacheDataSize(int size) {
         SerialPortManager.serialPortCacheDataSize = size;
     }
 
@@ -151,9 +152,10 @@ public class SerialPortManager {
                 Looper.prepare();
                 byte[] buffer = new byte[serialPortCacheDataSize];
                 while (true) {
-                    if (buffer.length != serialPortCacheDataSize){
+                    if (buffer.length != serialPortCacheDataSize) {
                         buffer = new byte[serialPortCacheDataSize];
                     }
+                    Arrays.fill(buffer, (byte) 0);
                     if (Thread.currentThread().isInterrupted()) {
                         break;
                     }
@@ -165,16 +167,15 @@ public class SerialPortManager {
                     final int size;
                     try {
                         available = inputStream.available();
-                        size = inputStream.read(buffer,0,available);
+                        size = inputStream.read(buffer, 0, available);
                     } catch (Exception e) {
                         continue;
                     }
                     if (size == 0) {
                         continue;
                     }
-                    Log.w("tag","available = " + available);
-                    Log.w("tag","size = " + size);
-                    final byte[] finalBuffer = buffer;
+                    final byte[] finalBuffer = new byte[size];
+                    System.arraycopy(finalBuffer, 0, buffer, 0, size);
                     HANDLER.post(new Runnable() {
                         @Override
                         public void run() {
@@ -183,7 +184,6 @@ public class SerialPortManager {
                             }
                         }
                     });
-                    SystemClock.sleep(50);
                 }
             }
         };

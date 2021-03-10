@@ -113,7 +113,7 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
                 result += ConversionUtil.byteArrayToHexStr(cache);
             } else {
                 String encoding = encodingRespiner.getSelectedItem().toString();
-                result += new String(data, Charset.forName(encoding));
+                result += new String(cache, Charset.forName(encoding));
             }
             receivedData.add(result);
             receivedDataRecyclerViewAdapter.notifyItemInserted(receivedData.size() - 1);

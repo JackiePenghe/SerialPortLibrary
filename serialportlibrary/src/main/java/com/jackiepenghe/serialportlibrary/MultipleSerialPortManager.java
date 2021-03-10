@@ -1,8 +1,6 @@
 package com.jackiepenghe.serialportlibrary;
 
-import android.os.Looper;
 import android.os.SystemClock;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -11,9 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -189,6 +186,7 @@ public class MultipleSerialPortManager {
                     if (buffer.length != serialPortCacheDataSize) {
                         buffer = new byte[serialPortCacheDataSize];
                     }
+                    Arrays.fill(buffer, (byte) 0);
                     if (Thread.currentThread().isInterrupted()) {
                         receiveDataThreads.remove(serialPortPath);
                         break;
@@ -202,7 +200,6 @@ public class MultipleSerialPortManager {
                         receiveDataThreads.remove(serialPortPath);
                         break;
                     }
-
                     SystemClock.sleep(readDataDelay);
                     int available;
                     final int size;
@@ -210,13 +207,13 @@ public class MultipleSerialPortManager {
                         available = inputStream.available();
                         size = inputStream.read(buffer, 0, available);
                     } catch (IOException e) {
-                        e.printStackTrace();
                         continue;
                     }
                     if (size == 0) {
                         continue;
                     }
-                    final byte[] finalBuffer = buffer;
+                    final byte[] finalBuffer = new byte[size];
+                    System.arraycopy(buffer, 0, finalBuffer, 0, size);
 
                     HANDLER.post(new Runnable() {
                         @Override
