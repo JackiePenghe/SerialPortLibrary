@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="baud_rate_array">
-        <item>@string/B0</item>
         <item>@string/B110</item>
         <item>@string/B300</item>
         <item>@string/B600</item>

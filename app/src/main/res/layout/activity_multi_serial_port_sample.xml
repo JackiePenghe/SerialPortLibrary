@@ -23,7 +23,7 @@
 
     <Button
         android:textAllCaps="false"
-        android:text="ttyS1 Send data"
+        android:text="ttyS3 Send data"
         android:onClick="write3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

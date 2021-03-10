@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.jackiepenghe.serialportlibrary.MultipleSerialPortManager;
 import com.jackiepenghe.serialportlibrary.OnSerialPortDataChangedListener;
 import com.sscl.baselibrary.activity.BaseAppCompatActivity;
+import com.sscl.baselibrary.utils.ConversionUtil;
 import com.sscl.baselibrary.utils.DebugUtil;
 import com.sscl.baselibrary.utils.ToastUtil;
 
@@ -99,7 +100,9 @@ public class MultiSerialPortSampleActivity extends BaseAppCompatActivity {
                 DebugUtil.warnOut(TAG, "serialPortDataReceived ttyS1");
                 byte[] validData = new byte[size];
                 System.arraycopy(data, 0, validData, 0, size);
+                DebugUtil.warnOut(TAG,"data = " + ConversionUtil.byteArrayToHexStr(validData));
                 String receivedData = new String(validData);
+                DebugUtil.warnOut(TAG,"data = " + receivedData);
                 ToastUtil.toast(MultiSerialPortSampleActivity.this, receivedData, 300);
             }
         });

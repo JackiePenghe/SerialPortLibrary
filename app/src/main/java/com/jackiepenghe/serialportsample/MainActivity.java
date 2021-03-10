@@ -103,7 +103,6 @@ public class MainActivity extends BaseAppCompatActivity {
 
     @Override
     protected void doAfterAll() {
-
     }
 
     @Override

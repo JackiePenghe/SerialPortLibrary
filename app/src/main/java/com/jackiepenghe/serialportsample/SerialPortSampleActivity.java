@@ -104,6 +104,8 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
         public void serialPortDataReceived(byte[] data, int size) {
             byte[] cache = new byte[size];
             System.arraycopy(data, 0, cache, 0, size);
+            DebugUtil.warnOut(TAG, "cache = " + ConversionUtil.byteArrayToHexStr(cache));
+            DebugUtil.warnOut(TAG, "cache = " + new String(cache, 0, size));
             String result = "";
             if (timeStampCb.isChecked()) {
                 result += getTimeStamp() + "\n-------------\n";
@@ -327,17 +329,17 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
 
     private void sendData() {
         String data = commandEt.getText().toString();
-        if (data.isEmpty()){
+        if (data.isEmpty()) {
             return;
         }
         String encoding = encodingRespiner.getSelectedItem().toString();
         boolean b;
         if (!hexCb.isChecked()) {
             b = SerialPortManager.writeData(data, Charset.forName(encoding));
-        }else {
+        } else {
             byte[] bytes = ConversionUtil.hexStringToByteArray(data);
-            if (bytes == null){
-                ToastUtil.toastLong(this,R.string.send_failed);
+            if (bytes == null) {
+                ToastUtil.toastLong(this, R.string.send_failed);
                 return;
             }
             b = SerialPortManager.writeData(bytes);
@@ -346,8 +348,8 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
         if (b) {
             sendData.add(data);
             sendDataRecyclerViewAdapter.notifyItemInserted(sendData.size() - 1);
-        }else {
-            ToastUtil.toastLong(this,R.string.send_failed);
+        } else {
+            ToastUtil.toastLong(this, R.string.send_failed);
         }
 
     }

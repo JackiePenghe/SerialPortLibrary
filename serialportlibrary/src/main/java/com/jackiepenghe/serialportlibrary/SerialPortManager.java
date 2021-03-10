@@ -174,8 +174,9 @@ public class SerialPortManager {
                     if (size == 0) {
                         continue;
                     }
+
                     final byte[] finalBuffer = new byte[size];
-                    System.arraycopy(finalBuffer, 0, buffer, 0, size);
+                    System.arraycopy(buffer, 0, finalBuffer, 0, size);
                     HANDLER.post(new Runnable() {
                         @Override
                         public void run() {
@@ -189,6 +190,24 @@ public class SerialPortManager {
         };
         receiveDataThread = THREAD_FACTORY.newThread(runnable);
         receiveDataThread.start();
+    }
+
+    /**
+     * byteArray转换成十六进制字符串
+     *
+     * @param byteArray byte数组
+     * @return String 每个Byte值之间空格分隔
+     */
+    @NonNull
+    public static String byteArrayToHexStr(@NonNull byte[] byteArray) {
+        String stmp;
+        StringBuilder sb = new StringBuilder();
+        for (byte aByte : byteArray) {
+            stmp = Integer.toHexString(aByte & 0xFF);
+            sb.append((stmp.length() == 1) ? "0" + stmp : stmp);
+            sb.append(" ");
+        }
+        return sb.toString().toUpperCase().trim();
     }
 
     private SerialPortManager() {
