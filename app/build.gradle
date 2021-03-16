@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "com.jackiepenghe.serialportsample"
         minSdkVersion 16
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
@@ -21,6 +21,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
+
 }
 
 dependencies {
@@ -28,8 +34,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-    implementation 'com.sscl:baselibrary:2.0.0'
-//    implementation 'com.sscl:serialportlibrary:0.0.2'
+    implementation 'com.sscl:baselibrary:2.0.10'
     implementation project(path: ':serialportlibrary')
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation project(path: ':recyclerviewadapterhelperxlibrary')
