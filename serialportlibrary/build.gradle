@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 30
-        versionCode 4
-        versionName "0.0.4"
+        versionCode 5
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
@@ -39,7 +39,7 @@ dependencies {
 
 
 
-version = "0.0.4"
+version = "1.0.0"
 
 def siteUrl = 'https://github.com/JackiePenghe/SerialPortSample'
 def gitUrl = 'https://github.com/JackiePenghe/SerialPortSample.git'
