@@ -1,6 +1,7 @@
 package com.jackiepenghe.serialportlibrary;
 
 import android.os.SystemClock;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -24,9 +25,13 @@ import static com.jackiepenghe.serialportlibrary.Constants.THREAD_FACTORY;
  */
 public class MultipleSerialPortManager {
 
+    private static final String TAG = MultipleSerialPortManager.class.getSimpleName();
+
     private static int serialPortCacheDataSize = 1024;
 
     private static int readDataDelay = 100;
+
+    private static int debugLevel = DebugLevel.OFF;
 
     private static HashMap<String, InputStream> inputStreams = new HashMap<>();
 
@@ -139,23 +144,17 @@ public class MultipleSerialPortManager {
     }
 
     public static boolean writeData(String serialPortPath, String data) {
+        debug(TAG,"data = " + data);
         return writeData(serialPortPath, data, Charset.forName("GBK"));
     }
 
     public static boolean writeData(String serialPortPath, String data, Charset charset) {
-        if (!outputStreams.containsKey(serialPortPath)) {
-            return false;
-        }
-        OutputStream outputStream = outputStreams.get(serialPortPath);
-        if (outputStream == null) {
-            return false;
-        }
-        try {
-            outputStream.write(data.getBytes(charset));
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
+        debug(TAG,"data = " + data);
+        return writeData(serialPortPath, data.getBytes(charset));
+    }
+
+    public static void setDebugLevel(int debugLevel) {
+        MultipleSerialPortManager.debugLevel = debugLevel;
     }
 
     public static boolean writeData(String serialPortPath, byte[] data) {
@@ -166,11 +165,43 @@ public class MultipleSerialPortManager {
         if (outputStream == null) {
             return false;
         }
+        debug(TAG,"data = " + SerialPortManager.byteArrayToHexStr(data));
         try {
             outputStream.write(data);
             return true;
         } catch (IOException e) {
             return false;
+        }
+    }
+
+    /**
+     * 打印调试信息
+     *
+     * @param tag TAG
+     * @param msg 调试信息
+     */
+    private static void debug(String tag, String msg) {
+
+        switch (debugLevel) {
+            case DebugLevel.VERBOSE:
+                Log.v(tag, msg);
+                break;
+            case DebugLevel.DEBUG:
+                Log.d(tag, msg);
+                break;
+            case DebugLevel.INFO:
+                Log.i(tag, msg);
+                break;
+            case DebugLevel.WARNING:
+                Log.w(tag, msg);
+                break;
+            case DebugLevel.ERROR:
+                Log.e(tag, msg);
+                break;
+            case DebugLevel.OFF:
+            default:
+                Log.e(tag, "debug is disable");
+                break;
         }
     }
 

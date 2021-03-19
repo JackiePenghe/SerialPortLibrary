@@ -33,6 +33,8 @@ public class SerialPortManager {
 
     private static final Handler HANDLER = new Handler();
 
+    private static final String TAG = SerialPortManager.class.getSimpleName();
+
     private static int serialPortCacheDataSize = 1024;
 
     private static int readDataDelay = 100;
@@ -44,6 +46,8 @@ public class SerialPortManager {
     private static OutputStream outputStream;
 
     private static Thread receiveDataThread;
+
+    private static int debugLevel = DebugLevel.OFF;
 
     private static SerialPortFinder serialPortFinder = SerialPortFinder.getInstance();
 
@@ -119,26 +123,54 @@ public class SerialPortManager {
     }
 
     public static boolean writeData(String data, Charset charset) {
-        if (outputStream == null) {
-            return false;
-        }
-        try {
-            outputStream.write(data.getBytes(charset));
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
+        return writeData(data.getBytes(charset));
     }
 
     public static boolean writeData(byte[] data) {
         if (outputStream == null) {
             return false;
         }
+        debug(TAG,"data " + byteArrayToHexStr(data));
         try {
             outputStream.write(data);
             return true;
         } catch (IOException e) {
             return false;
+        }
+    }
+
+    public static void setDebugLevel(int debugLevel) {
+        SerialPortManager.debugLevel = debugLevel;
+    }
+
+    /**
+     * 打印调试信息
+     *
+     * @param tag TAG
+     * @param msg 调试信息
+     */
+    private static void debug(String tag, String msg) {
+
+        switch (debugLevel) {
+            case DebugLevel.VERBOSE:
+                Log.v(tag, msg);
+                break;
+            case DebugLevel.DEBUG:
+                Log.d(tag, msg);
+                break;
+            case DebugLevel.INFO:
+                Log.i(tag, msg);
+                break;
+            case DebugLevel.WARNING:
+                Log.w(tag, msg);
+                break;
+            case DebugLevel.ERROR:
+                Log.e(tag, msg);
+                break;
+            case DebugLevel.OFF:
+            default:
+                Log.e(tag, "debug is disable");
+                break;
         }
     }
 
