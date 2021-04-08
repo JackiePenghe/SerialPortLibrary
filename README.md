@@ -7,7 +7,7 @@ this is a library to use serial port for android!
 # 配置(Configure)
 
 ```xml
-implementation 'com.sscl:serialportlibrary:0.0.3'
+implementation 'com.sscl:serialportlibrary:1.0.0'
 ```
 
 # 使用（use）
@@ -91,14 +91,18 @@ The default read delay value is 100 ms;
 SerialPortManager.setReadDataDelay(readDelay);
 ```
 
-### 0.0.2版本新增（0.0.2version）
+### 0.0.2版本新增（0.0.2 version）
 
 MultipleSerialPortManager类。这个类支持同时打开多个串口，并单独对已打开的串口进行操作。用法与SerialPortManager完全一致
 
 Add a new class MultipleSerialPortManager.That class can be open and operation multiple serial port.
 
-### 0.0.3版本修改（0.0.3version）
+### 0.0.3版本修改（0.0.3 version）
 使用MultipleSerialPortManager类打开串口时，需要传递一个回调。方便单独监听.
 
 when use MultipleSerialPortManager class to open your serialport,need to set callback!
 
+### 1.0.0版本修改（1.0.0 version）
+第一版本正式发布
+
+The first release version
