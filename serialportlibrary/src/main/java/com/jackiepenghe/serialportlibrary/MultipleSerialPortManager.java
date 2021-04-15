@@ -144,12 +144,11 @@ public class MultipleSerialPortManager {
     }
 
     public static boolean writeData(String serialPortPath, String data) {
-        debug(TAG,"data = " + data);
         return writeData(serialPortPath, data, Charset.forName("GBK"));
     }
 
     public static boolean writeData(String serialPortPath, String data, Charset charset) {
-        debug(TAG,"data = " + data);
+        debug(TAG, "data = " + data + ",charset = " + charset.name());
         return writeData(serialPortPath, data.getBytes(charset));
     }
 
@@ -165,7 +164,7 @@ public class MultipleSerialPortManager {
         if (outputStream == null) {
             return false;
         }
-        debug(TAG,"data = " + SerialPortManager.byteArrayToHexStr(data));
+        debug(TAG, "data = " + SerialPortManager.byteArrayToHexStr(data));
         try {
             outputStream.write(data);
             return true;

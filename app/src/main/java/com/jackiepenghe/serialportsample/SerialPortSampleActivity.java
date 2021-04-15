@@ -16,6 +16,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.jackiepenghe.serialportlibrary.OnSerialPortDataChangedListener;
 import com.jackiepenghe.serialportlibrary.SerialPortManager;
 import com.jackiepenghe.serialportsample.adapter.ReceivedDataRecyclerViewAdapter;
@@ -105,7 +106,7 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
             byte[] cache = new byte[size];
             System.arraycopy(data, 0, cache, 0, size);
             DebugUtil.warnOut(TAG, "cache = " + ConversionUtil.byteArrayToHexStr(cache));
-            DebugUtil.warnOut(TAG, "cache = " + new String(cache, 0, size));
+            DebugUtil.warnOut(TAG, "cache = " + new String(cache));
             String result = "";
             if (timeStampCb.isChecked()) {
                 result += getTimeStamp() + "\n-------------\n";
@@ -204,6 +205,22 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
         sendBtn.setOnClickListener(onClickListener);
         hexCb.setOnCheckedChangeListener(onCheckedChangeListener);
         SerialPortManager.setOnSerialPortDataChangedListener(onSerialPortDataChangedListener);
+        sendDataRecyclerViewAdapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
+                sendData.clear();
+                sendDataRecyclerViewAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
+        receivedDataRecyclerViewAdapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
+                receivedData.clear();
+                receivedDataRecyclerViewAdapter.notifyLoadMoreToLoading();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -348,6 +365,7 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
         if (b) {
             sendData.add(data);
             sendDataRecyclerViewAdapter.notifyItemInserted(sendData.size() - 1);
+            sendDataRecyclerView.scrollToPosition(sendData.size() - 1);
         } else {
             ToastUtil.toastLong(this, R.string.send_failed);
         }

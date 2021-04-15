@@ -1,10 +1,8 @@
 package com.jackiepenghe.serialportlibrary;
 
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.util.DebugUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -123,6 +121,7 @@ public class SerialPortManager {
     }
 
     public static boolean writeData(String data, Charset charset) {
+        debug(TAG, "data " + data + ",charset = " + charset.name());
         return writeData(data.getBytes(charset));
     }
 
@@ -130,7 +129,7 @@ public class SerialPortManager {
         if (outputStream == null) {
             return false;
         }
-        debug(TAG,"data " + byteArrayToHexStr(data));
+        debug(TAG, "data " + byteArrayToHexStr(data));
         try {
             outputStream.write(data);
             return true;
