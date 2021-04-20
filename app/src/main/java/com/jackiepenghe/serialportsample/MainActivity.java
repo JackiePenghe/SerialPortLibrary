@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.jackiepenghe.serialportlibrary.MultipleSerialPortManager;
 import com.jackiepenghe.serialportlibrary.OnSerialPortDataChangedListener;
 import com.jackiepenghe.serialportlibrary.SerialPortManager;
 import com.jackiepenghe.serialportsample.adapter.ReceivedDataRecyclerViewAdapter;
@@ -43,6 +44,8 @@ public class MainActivity extends BaseAppCompatActivity {
 
     private Button multiUseBtn;
 
+    private Button exitBtn;
+
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -52,6 +55,9 @@ public class MainActivity extends BaseAppCompatActivity {
                     break;
                 case R.id.multi:
                     jumpToMultiUseSampleActivity();
+                    break;
+                case R.id.exit:
+                    onBackPressed();
                     break;
                 default:
                     break;
@@ -83,6 +89,7 @@ public class MainActivity extends BaseAppCompatActivity {
     protected void initViews() {
         singleUseBtn = findViewById(R.id.single);
         multiUseBtn = findViewById(R.id.multi);
+        exitBtn = findViewById(R.id.exit);
     }
 
     @Override
@@ -99,6 +106,7 @@ public class MainActivity extends BaseAppCompatActivity {
     protected void initEvents() {
         singleUseBtn.setOnClickListener(onClickListener);
         multiUseBtn.setOnClickListener(onClickListener);
+        exitBtn.setOnClickListener(onClickListener);
     }
 
     @Override
@@ -118,6 +126,8 @@ public class MainActivity extends BaseAppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        SerialPortManager.closeSerialPort();
+        MultipleSerialPortManager.closeAll();
     }
 
 

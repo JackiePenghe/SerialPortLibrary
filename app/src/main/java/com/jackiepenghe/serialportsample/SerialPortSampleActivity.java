@@ -217,7 +217,7 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
             @Override
             public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
                 receivedData.clear();
-                receivedDataRecyclerViewAdapter.notifyLoadMoreToLoading();
+                receivedDataRecyclerViewAdapter.notifyDataSetChanged();
                 return true;
             }
         });
