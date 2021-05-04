@@ -17,7 +17,7 @@ this is a library to use serial port for android!
 
 ```xml
 	dependencies {
-	        implementation 'com.github.JackiePenghe:BleLibrary:release-version'
+	        implementation 'com.github.JackiePenghe:SerialPortLibrary:release-version'
 	}
 ```
 
