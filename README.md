@@ -7,7 +7,18 @@ this is a library to use serial port for android!
 # 配置(Configure)
 
 ```xml
-implementation 'com.sscl:serialportlibrary:1.0.0'
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
+```xml
+	dependencies {
+	        implementation 'com.github.JackiePenghe:BleLibrary:release-version'
+	}
 ```
 
 # 使用（use）
