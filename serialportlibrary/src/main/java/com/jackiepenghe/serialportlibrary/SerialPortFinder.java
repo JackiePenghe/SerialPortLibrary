@@ -76,6 +76,7 @@ class SerialPortFinder {
                     }
                 }
             }
+            Log.d("TAG", "getDevices() returned: " + mDevices.toString());
             return mDevices;
         }
 

@@ -69,6 +69,7 @@ public class MultipleSerialPortManager {
             outputStreams.put(serialPortPath, outputStream);
             startReceiveDataThread(serialPortPath);
             onSerialPortDataChangedListeners.put(serialPortPath, onSerialPortDataChangedListener);
+            serialPorts.put(serialPortPath, serialPort);
             return true;
         } catch (IOException | SecurityException e) {
             closeSerialPort(serialPortPath);
