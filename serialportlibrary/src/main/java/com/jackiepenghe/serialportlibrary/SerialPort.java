@@ -154,6 +154,6 @@ class SerialPort {
     }
 
     static {
-        System.loadLibrary("SerialPort");
+        System.loadLibrary("JackiePengheSerialPort");
     }
 }
