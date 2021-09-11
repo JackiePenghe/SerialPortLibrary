@@ -226,6 +226,7 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
     @Override
     protected void doAfterAll() {
         getSerialPortInfo();
+        SerialPortManager.setReadDataDelay(100);
     }
 
     @Override

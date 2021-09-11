@@ -51,6 +51,8 @@ public class SerialPortManager {
 
     private static SerialPort serialPort;
 
+    private static boolean needAvailable;
+
     public static void setOnSerialPortDataChangedListener(OnSerialPortDataChangedListener onSerialPortDataChangedListener) {
         SerialPortManager.onSerialPortDataChangedListener = onSerialPortDataChangedListener;
     }
@@ -106,6 +108,10 @@ public class SerialPortManager {
             }
             outputStream = null;
         }
+    }
+
+    public static void setNeedAvailable(boolean needAvailable) {
+        SerialPortManager.needAvailable = needAvailable;
     }
 
     public static void setSerialPortCacheDataSize(int size) {
@@ -173,6 +179,7 @@ public class SerialPortManager {
         }
     }
 
+
     private static void startReceiveDataThread() {
         if (receiveDataThread != null && receiveDataThread.isAlive()) {
             return;
@@ -197,28 +204,54 @@ public class SerialPortManager {
                     int available;
                     final int size;
                     try {
-                        available = inputStream.available();
-                        size = inputStream.read(buffer, 0, available);
-                    } catch (Exception e) {
-                        continue;
-                    }
-                    if (size == 0) {
-                        continue;
-                    }
-
-                    final byte[] finalBuffer = new byte[size];
-                    System.arraycopy(buffer, 0, finalBuffer, 0, size);
-                    HANDLER.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (onSerialPortDataChangedListener != null) {
-                                onSerialPortDataChangedListener.serialPortDataReceived(finalBuffer, size);
-                            }
+                        if (needAvailable) {
+                            available = inputStream.available();
+                            size = inputStream.read(buffer, 0, available);
+                        }else {
+                            size = inputStream.read(buffer);
                         }
-                    });
+                        if (size == 0) {
+                            continue;
+                        }
+                        final byte[] finalBuffer = new byte[size];
+                        System.arraycopy(buffer, 0, finalBuffer, 0, size);
+                        HANDLER.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (onSerialPortDataChangedListener != null) {
+                                    onSerialPortDataChangedListener.serialPortDataReceived(finalBuffer, size);
+                                }
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         };
+//        runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                Looper.prepare();
+//                while (true){
+//                    byte[] buffer = new byte[serialPortCacheDataSize];
+//                    try {
+//                        final int size = inputStream.read(buffer);
+//                        final byte[] readBytes = new byte[size];
+//                        HANDLER.post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                if (onSerialPortDataChangedListener != null) {
+//                                    onSerialPortDataChangedListener.serialPortDataReceived(readBytes, size);
+//                                }
+//                            }
+//                        });
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        };
         receiveDataThread = THREAD_FACTORY.newThread(runnable);
         receiveDataThread.start();
     }

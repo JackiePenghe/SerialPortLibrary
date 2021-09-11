@@ -147,7 +147,7 @@
 
 <!--                android:text="save*buffet=1#"-->
             <EditText
-                android:text="write*lock=001#"
+                android:text="open*id=001#"
                 android:id="@+id/command_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
