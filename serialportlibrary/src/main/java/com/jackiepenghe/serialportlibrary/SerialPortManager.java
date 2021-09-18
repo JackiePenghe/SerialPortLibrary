@@ -29,7 +29,7 @@ public class SerialPortManager {
         }
     };
 
-    private static final Handler HANDLER = new Handler();
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     private static final String TAG = SerialPortManager.class.getSimpleName();
 
