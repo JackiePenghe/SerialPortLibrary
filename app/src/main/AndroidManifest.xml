@@ -15,8 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar.FullScreen">
         <activity android:name=".MultiSerialPortSampleActivity"></activity>
-        <activity android:name=".SerialPortSampleActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".SerialPortSampleActivity" />
         <activity
             android:name=".MainActivity">
             <intent-filter>
