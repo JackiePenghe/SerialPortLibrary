@@ -1,39 +1,16 @@
 package com.jackiepenghe.serialportsample;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.jackiepenghe.serialportlibrary.MultipleSerialPortManager;
-import com.jackiepenghe.serialportlibrary.OnSerialPortDataChangedListener;
 import com.jackiepenghe.serialportlibrary.SerialPortManager;
-import com.jackiepenghe.serialportsample.adapter.ReceivedDataRecyclerViewAdapter;
-import com.jackiepenghe.serialportsample.adapter.SendDataRecyclerViewAdapter;
-import com.jackiepenghe.serialportsample.adapter.SerialPortAdapter;
 import com.sscl.baselibrary.activity.BaseAppCompatActivity;
-import com.sscl.baselibrary.textwatcher.HexTextAutoAddEmptyCharInputWatcher;
-import com.sscl.baselibrary.utils.ConversionUtil;
-import com.sscl.baselibrary.utils.DebugUtil;
-import com.sscl.baselibrary.utils.DefaultItemDecoration;
-import com.sscl.baselibrary.utils.ToastUtil;
-import com.sscl.baselibrary.widget.ReSpinner;
-
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * @author pengh

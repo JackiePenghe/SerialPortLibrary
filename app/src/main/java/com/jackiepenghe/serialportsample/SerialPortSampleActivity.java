@@ -295,8 +295,7 @@ public class SerialPortSampleActivity extends BaseAppCompatActivity {
      */
     private void openSerialPort() {
         if (SerialPortManager.isOpened()) {
-            ToastUtil.toastLong(this, R.string.serial_port_is_opend);
-            return;
+            SerialPortManager.closeSerialPort();
         }
 
         String serialPort = serialPortAdapterData.get(serialPortReSpinner.getSelectedItemPosition());
