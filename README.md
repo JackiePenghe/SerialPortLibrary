@@ -4,6 +4,10 @@
 
 this is a library to use serial port for android!
 
+由于个人原因，此仓库已迁移到gitee
+
+[传送门quick jump](https://gitee.com/sscl/SerialPortLibrary)
+
 # 配置(Configure)
 
 ```xml
